@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<base target="_top">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Poka Yoke Sorting • SMG1</title>
@@ -278,37 +279,8 @@
   .dica b i{width:8px;height:8px;border-radius:50%;display:inline-block}
   .demo-bar{background:var(--laranja);color:#fff;text-align:center;font-weight:800;font-size:12px;padding:6px 12px;position:relative;z-index:31}
 </style>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="config.js"></script>
-<script src="api.js"></script>
-<style>
-  .login{position:fixed;inset:0;background:var(--ml);z-index:90;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
-  .login.off{opacity:0;pointer-events:none}
-  .lbox{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.18);padding:36px 40px;width:min(420px,92vw);text-align:center;animation:up .5s var(--ease) both}
-  .lbox .ic{width:64px;height:64px;border-radius:50%;background:var(--ml);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
-  .lbox h2{margin:0 0 6px;font-size:20px;font-weight:900;color:var(--navy)}
-  .lbox p{margin:0 0 22px;color:var(--sub);font-size:13px;line-height:1.5}
-  .gbtn{display:inline-flex;align-items:center;gap:10px;border:1px solid #DADCE0;background:#fff;border-radius:6px;padding:11px 18px;font-weight:700;font-size:14px;color:#3c4043;transition:all .2s}
-  .gbtn:hover{background:#F8F9FA;box-shadow:var(--sh1)}
-  .gbtn:disabled{opacity:.6;cursor:wait}
-  .lerr{color:var(--vermelho);font-size:12px;font-weight:700;margin-top:14px;min-height:16px}
-  .demo{display:inline-block;margin-top:10px;font-size:11px;font-weight:800;background:var(--laranja-l);color:var(--laranja);padding:3px 10px;border-radius:10px}
-</style>
 </head>
 <body>
-<div class="login" id="login">
-  <div class="lbox">
-    <div class="ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2D3277" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></div>
-    <h2>Poka Yoke Sorting · SMG1</h2>
-    <p id="lmsg">Entre com a sua conta do Mercado Livre para ver o painel e marcar as tratativas.</p>
-    <button class="gbtn" id="gbtn" onclick="entrar()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
-      <span id="gtxt">Entrar com Google</span>
-    </button>
-    <div class="lerr" id="lerr"></div>
-    <div id="ldemo"></div>
-  </div>
-</div>
 
 <header>
   <div class="hbar">
@@ -323,7 +295,7 @@
     </div>
     <div class="grow"></div>
     <div class="sync"><span class="dot" id="dot"></span><span id="syncTxt">Conectando…</span></div>
-    <div class="auto" id="auto" onclick="toggleAuto()" title="Atualiza a query sozinho de 5 em 5 minutos enquanto pelo menos um painel estiver aberto. Vale para todo mundo.">
+    <div class="auto" id="auto" onclick="toggleAuto()" title="Atualiza a query sozinho de 5 em 5 minutos, no servidor do Google (funciona mesmo com todos os PCs desligados). Vale para todo mundo.">
       <span class="sw2"></span>
       <span class="at">Auto 5 min<small id="autoTxt">desligado</small></span>
       <svg class="anel" viewBox="0 0 24 24"><circle class="tr" cx="12" cy="12" r="9"/><circle class="pg" id="anel" cx="12" cy="12" r="9" stroke-dasharray="56.5" stroke-dashoffset="56.5"/></svg>
@@ -474,45 +446,31 @@ const SUBST = {
 const txt = s => s.replace(/<[^>]+>/g,'');
 
 let ROWS = [], TRAT = {}, META = {}, ME = '', filtroErro = '', filtroTrat = 'pend', abertos = new Set(), online = true, vistos = new Set(), primeira = true;
-const DEMO = !window.CONFIG || !CONFIG.CLIENT_ID || /^COLE/.test(CONFIG.CLIENT_ID);
+/* ================== CONFIGURAÇÃO ==================
+   Link /exec da implantação do Apps Script (o "motor").            */
+const API_URL = 'https://script.google.com/a/macros/mercadolivre.com/s/AKfycbywEBsm02SXzMRyMpfWOXVNuIxN8WrOcF75C2VksrMZ3AEPJyIL0UXaMjURoCmg3GDnhQ/exec';
+const GAS = true;
 
-/* ---------- servidor: BigQuery + Sheets direto do navegador (api.js) ---------- */
-async function call(fn, ...args){
-  if (DEMO) return new Promise(res => setTimeout(() => res(MOCK[fn] ? MOCK[fn](...args) : null), fn === 'atualizarQuery' ? 1500 : 250));
-  try { return await API[fn](...args); }
-  catch(e){ if (e.message === 'LOGIN') mostrarLogin('Sua sessão expirou. Entre de novo para continuar.'); throw e; }
+/* ---------- servidor: Apps Script como API (JSONP, funciona a partir do GitHub) ---------- */
+let _seq = 0;
+function call(fn, ...args){
+  return new Promise((res, rej) => {
+    const cb = '__py' + Date.now() + '_' + (++_seq);
+    const s = document.createElement('script');
+    const limite = fn === 'atualizarQuery' ? 120000 : 30000;
+    const fim = () => { clearTimeout(t); delete window[cb]; s.remove(); };
+    const t = setTimeout(() => { fim(); avisoLogin(); rej(new Error('O Apps Script não respondeu. Veja o aviso no topo.')); }, limite);
+    window[cb] = r => { fim(); esconderAviso(); r && r.ok ? res(r.data) : rej(new Error((r && r.error) || 'erro desconhecido')); };
+    s.onerror = () => { fim(); avisoLogin(); rej(new Error('Não consegui falar com o Apps Script.')); };
+    s.src = API_URL + '?api=' + encodeURIComponent(fn) + '&args=' + encodeURIComponent(JSON.stringify(args)) + '&callback=' + cb + '&_=' + Date.now();
+    document.head.appendChild(s);
+  });
 }
-
-function mostrarLogin(msg){
-  document.getElementById('login').classList.remove('off');
-  if (msg) document.getElementById('lmsg').textContent = msg;
-  document.getElementById('gbtn').disabled = false; document.getElementById('gtxt').textContent = 'Entrar com Google';
+function avisoLogin(){
+  if (document.getElementById('avisoLogin')) return;
+  document.body.insertAdjacentHTML('afterbegin', '<div id="avisoLogin" class="demo-bar" style="background:#2D3277">Não consegui conectar ao Google. <a href="' + API_URL + '" target="_blank" style="color:#FFE600;font-weight:900">Clique aqui para entrar com a conta @mercadolivre.com</a> e depois recarregue esta página (F5). Se continuar, libere cookies de terceiros para script.google.com.</div>');
 }
-let iniciado = false;
-async function entrar(){
-  const b = document.getElementById('gbtn'), err = document.getElementById('lerr');
-  err.textContent = '';
-  if (DEMO){ document.getElementById('login').classList.add('off'); return iniciar(); }
-  if (typeof google === 'undefined' || !google.accounts){ err.textContent = 'Carregando o login do Google… tente de novo em 2 segundos.'; return; }
-  b.disabled = true; document.getElementById('gtxt').textContent = 'Entrando…';
-  try{
-    await API.login();
-    document.getElementById('login').classList.add('off');
-    iniciar();
-  }catch(e){
-    b.disabled = false; document.getElementById('gtxt').textContent = 'Entrar com Google';
-    err.textContent = e.message;
-  }
-}
-function iniciar(){
-  if (iniciado){ carregar(); return; }
-  iniciado = true;
-  carregar();
-  setInterval(poll, ((window.CONFIG && CONFIG.SYNC_SEGUNDOS) || 10) * 1000);
-  if (!DEMO) setInterval(async () => {
-    try{ const r = await API.autoTick(); if (r && r.ok) carregar(); }catch(e){}
-  }, 30000);
-}
+function esconderAviso(){ const a = document.getElementById('avisoLogin'); if (a) a.remove(); }
 
 async function carregar(){
   try{
@@ -860,7 +818,8 @@ const MOCK = (() => {
 if (typeof DEMO !== 'undefined' ? DEMO : !GAS) document.body.insertAdjacentHTML('afterbegin', '<div class="demo-bar">MODO DEMONSTRAÇÃO · dados de exemplo, nada é sincronizado. Abra pelo link oficial do painel para ver os dados reais.</div>');
 
 renderGuia(); skeleton(); moverPill(); window.addEventListener('resize', moverPill);
-if (DEMO) document.getElementById('ldemo').innerHTML = '<span class="demo">MODO DEMONSTRAÇÃO · configure o CLIENT_ID no config.js</span>';
+carregar();
+setInterval(poll, 10000);
 </script>
 </body>
 </html>
