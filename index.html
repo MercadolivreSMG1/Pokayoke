@@ -5,6 +5,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Poka Yoke Sorting • SMG1</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2732%27%20r%3D%2730%27%20fill%3D%27%23FFE600%27/%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%232D3277%27%20stroke-width%3D%274.5%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M48%2023L32%2014%2016%2023v18l16%209%2016-9z%27/%3E%3Cpath%20d%3D%27M16%2023l16%209%2016-9M32%2032v18%27/%3E%3C/g%3E%3C/svg%3E">
+<meta name="theme-color" content="#FFE600">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -312,7 +314,7 @@
     <div class="kpi a-up" style="--i:1;--c:var(--azul);--bgc:var(--azul-l)"><div class="top"><div class="l">Pacotes com erro</div><div class="ico">📦</div></div><div class="v" id="kPac">–</div><div class="d" id="kPacD">&nbsp;</div></div>
     <div class="kpi a-up" style="--i:2;--c:var(--laranja);--bgc:var(--laranja-l)"><div class="top"><div class="l">Pendentes de tratativa</div><div class="ico">⏳</div></div><div class="v" id="kPend">–</div><div class="d" id="kPendD">pacotes que ninguém tratou ainda</div></div>
     <div class="kpi a-up" style="--i:3;--c:var(--verde);--bgc:var(--verde-l)"><div class="top"><div class="l">Tratados</div><div class="ico">✓</div></div><div class="v" id="kTrat">–</div><div class="bar"><i id="kTratBar"></i></div></div>
-    <div class="kpi a-up" style="--i:4;--c:var(--roxo);--bgc:var(--roxo-l)"><div class="top"><div class="l">Erros em saca</div><div class="ico">👜</div></div><div class="v" id="kSaca">–</div><div class="d">bipou a saca em vez da gaiola</div></div>
+    <div class="kpi a-up" style="--i:4;--c:var(--roxo);--bgc:var(--roxo-l)"><div class="top"><div class="l">Erros com saca</div><div class="ico">👜</div></div><div class="v" id="kSaca">–</div><div class="d">pacote com saca correta definida</div></div>
   </section>
 
   <section class="chips a-up" style="--i:5" id="chips"></section>
@@ -339,7 +341,7 @@
             <th data-tip="Nome do representante. Se não houver nome cadastrado, aparece o usuário.">Colaborador</th>
             <th data-tip="Tipos de erro que o colaborador cometeu nesse pacote. ×2, ×3… = quantas vezes cada erro aconteceu.">Erros</th>
             <th data-tip="Quantas vezes essa pessoa bipou esse pacote hoje. Cinza = 1 · Laranja = 2 ou 3 · Vermelho = 4 ou mais.">Bipes</th>
-            <th data-tip="Em vermelho, a gaiola que o colaborador bipou. Em verde, a gaiola certa do pacote. Em roxo, a saca, quando o bipe foi numa saca.">Bipada → Correta</th>
+            <th data-tip="Em vermelho, a gaiola que o colaborador bipou. Em verde, a gaiola certa do pacote. Em roxo, a saca correta do pacote (dentro da gaiola certa).">Bipada → Correta</th>
             <th data-tip="Motivo informado no QR code de não alocação (só aparece em Problema QR e QR sem Poka Yoke).">Motivo QR</th>
             <th data-tip="Onde o pacote está agora. No carrinho = já foi guardado numa gaiola/saca. Em separação = ainda não foi guardado.">Substatus</th>
             <th data-tip="✓ = tratado · ✕ = não tratado (não deu para resolver) · 📝 = escrever o que aconteceu. Todos os computadores veem em até 10 s, assim ninguém vai duas vezes no mesmo pacote.">Tratativa</th>
@@ -372,7 +374,7 @@
         <h5>📍 Bipada → Correta</h5>
         <div class="ln"><b style="color:var(--vermelho)">B14_AM1</b> gaiola que o colaborador bipou</div>
         <div class="ln"><b style="color:var(--verde)">B12_AM1</b> gaiola certa do pacote</div>
-        <div class="ln"><span class="saca" style="margin:0">saca 65102</span> número da saca, quando o bipe foi numa saca</div>
+        <div class="ln"><span class="saca" style="margin:0">saca 65102</span> saca correta do pacote, dentro da gaiola certa</div>
       </div>
       <div class="it">
         <h5>🚚 Substatus</h5>
@@ -726,8 +728,8 @@ function render(animar){
     const bc = g.bipes >= 4 ? ['#F23D4F','#FDECEE','alto'] : g.bipes >= 2 ? ['#FF7733','#FFF0E8',''] : ['#737373','#F5F5F5',''];
     const ss = SUBST[g.sub] || {t:g.subPt||'—', c:'#737373', bg:'#F5F5F5'};
     const rota = (vazio(g.gb) && vazio(g.gc)) ? '<span style="color:#bbb">—</span>' :
-      `<span class="err">${esc(vazio(g.gb)?'—':g.gb)}</span>${g.sb?`<span class="saca">saca ${esc(g.sb)}</span>`:''}<span class="seta">→</span><span class="cor">${esc(vazio(g.gc)?'—':g.gc)}</span>`;
-    const det = aberto ? `<tr class="det"><td colspan="9"><div class="tl">${g.eventos.map((e,j) => { const s = ERROS[e.erro]||{}; return `<div style="--i:${j};--c:${s.c}"><span class="h">${hhmm(e.ts)}</span><span class="tag" data-dica="${esc(s.o?txt(s.o):'')}" data-dica-t="${esc(s.nome||e.erro)}" style="color:${s.c};background:${s.bg}">${esc(s.nome||e.erro)}</span>${!vazio(e.gaiola_bipada)?'bipou <b>'+esc(e.gaiola_bipada)+'</b>'+(!vazio(e.saca_bipada)?' (saca '+esc(e.saca_bipada)+')':''):''}${!vazio(e.gaiola_correta)?' · correta <b>'+esc(e.gaiola_correta)+'</b>':''}${!vazio(e.shp_bipado)?' · pacote bipado <b>'+esc(e.shp_bipado)+'</b>':''}${!vazio(e.motivo_qr)?' · motivo: <b>'+esc(e.motivo_qr)+'</b>':''}</div>`; }).join('')}</div></td></tr>` : '';
+      `<span class="err">${esc(vazio(g.gb)?'—':g.gb)}</span><span class="seta">→</span><span class="cor">${esc(vazio(g.gc)?'—':g.gc)}</span>${g.sb?`<span class="saca" data-dica="Saca correta do pacote, dentro da gaiola correta." data-dica-t="Saca ${esc(g.sb)}">saca ${esc(g.sb)}</span>`:''}`;
+    const det = aberto ? `<tr class="det"><td colspan="9"><div class="tl">${g.eventos.map((e,j) => { const s = ERROS[e.erro]||{}; return `<div style="--i:${j};--c:${s.c}"><span class="h">${hhmm(e.ts)}</span><span class="tag" data-dica="${esc(s.o?txt(s.o):'')}" data-dica-t="${esc(s.nome||e.erro)}" style="color:${s.c};background:${s.bg}">${esc(s.nome||e.erro)}</span>${!vazio(e.gaiola_bipada)?'bipou <b>'+esc(e.gaiola_bipada)+'</b>':''}${!vazio(e.gaiola_correta)?' · correta <b>'+esc(e.gaiola_correta)+'</b>'+(!vazio(e.saca_bipada)?' (saca '+esc(e.saca_bipada)+')':''):''}${!vazio(e.shp_bipado)?' · pacote bipado <b>'+esc(e.shp_bipado)+'</b>':''}${!vazio(e.motivo_qr)?' · motivo: <b>'+esc(e.motivo_qr)+'</b>':''}</div>`; }).join('')}</div></td></tr>` : '';
     return `<tr class="row ${st==='tratado'?'ok':''} ${aberto?'aberto':''} ${animar?'anim':''} ${novos.has(g.k)?'novo':''}" style="--i:${Math.min(i,30)}" data-id="${esc(g.id)}" onclick="abrir('${esc(g.k)}')">
       <td class="hora">${hhmm(g.ult)}<small><span class="car">▸</span>${g.eventos.length} evento${g.eventos.length>1?'s':''}</small></td>
       <td><div class="pac">${esc(g.id)}<button class="copy" title="Copiar ID" onclick="copiar('${esc(g.id)}', event)">⧉ copiar</button></div></td>
